@@ -1,17 +1,24 @@
 import React from "react";
 import Home from "./Homepage/Home";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Courses from "./Coursepage/Courses";
 import Signup from "./components/Signup";
+import { Toaster } from "react-hot-toast";
+import { useAuth } from "./context/AuthProvider";
+import Login from "./components/Login";
 
 const App = () => {
+  const [authUser, setAuthUser] = useAuth();
+  console.log(authUser);
   return (
     <>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/course" element={<Courses />} />
+        <Route path="/course" element={authUser ? <Courses /> : <Navigate to="/signup" />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login showModal={true} />} />
       </Routes>
+      <Toaster />
     </>
   );
 };

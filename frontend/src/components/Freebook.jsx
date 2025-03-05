@@ -1,14 +1,23 @@
-import React from "react";
-import list from "../../src/list.json";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css"; //react slick slider
 import Slider from "react-slick";
 import Cards from "./Cards";
 
 const Freebook = () => {
-  const filterData = list.filter((item) => {
-    return item.category === "free";
-  });
+  const [book, setBook] = useState([]);
+  useEffect(() => {
+    const getBook = async () => {
+      try {
+        const res = await axios.get("http://localhost:4001/book");
+        setBook(res.data.filter((data) => data.category === "free"));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getBook();
+  }, []);
 
   var settings = {
     dots: true,
@@ -24,6 +33,24 @@ const Freebook = () => {
         settings: {
           slidesToShow: 3,
           slidesToScroll: 3,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
+          infinite: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 820,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
           infinite: true,
           dots: true,
         },
@@ -48,18 +75,15 @@ const Freebook = () => {
 
   return (
     <>
-      <div className="max-w-screen-2xl container mx-aut md:px-20 px-4">
+      <div className="max-w-screen-2xl container mx-auto md:px-20 px-4">
         <div>
           <h1 className="font-semibold text-xl">Free Offered Courses</h1>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta hic
-            est voluptatum quo alias
-          </p>
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta hic est voluptatum quo alias</p>
         </div>
 
-        <div>
+        <div className="w-full max-w-screen-lg mx-auto">
           <Slider {...settings}>
-            {filterData.map((item) => {
+            {book.map((item) => {
               return <Cards item={item} key={item.id} />;
             })}
           </Slider>

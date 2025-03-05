@@ -1,22 +1,35 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import Login from "./Login";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const Signup = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from || "/";
+
+  /*react-hook-form */
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
-    document.getElementById("my_modal_3").close();
-  };
-  // Function to close modal before navigating
-  const handleSignUpClick = () => {
-    document.getElementById("my_modal_3").close();
+  const onSubmit = async (data) => {
+    try {
+      const res = await axios.post("http://localhost:4001/user/signup", data);
+      if (res.data) {
+        toast.success("Signup successful!");
+        navigate(from, { replace: true }); // Redirects correctly
+        setTimeout(() => {
+          window.location.reload();
+          localStorage.setItem("Users", JSON.stringify(res.data.user));
+        }, 500);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "signup failed. Please try again.");
+    }
   };
 
   return (
@@ -26,10 +39,7 @@ const Signup = () => {
           <div className="modal-box">
             <form method="dialog" onSubmit={handleSubmit(onSubmit)}>
               {/* if there is a button in form, it will close the modal */}
-              <Link
-                to="/"
-                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              >
+              <Link to="/" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
                 ✕
               </Link>
               <h3 className="font-bold text-lg">SignUp</h3>
@@ -43,11 +53,7 @@ const Signup = () => {
                   {...register("name", { required: true })}
                 />
                 <br />
-                {errors.email && (
-                  <span className="text-sm text-red-600">
-                    This field is required
-                  </span>
-                )}
+                {errors.name && <span className="text-sm text-red-600">This field is required</span>}
               </div>
               {/* email */}
               <div className="mt-4 space-y-2">
@@ -59,11 +65,7 @@ const Signup = () => {
                   {...register("email", { required: true })}
                 />
                 <br />
-                {errors.email && (
-                  <span className="text-sm text-red-600">
-                    This field is required
-                  </span>
-                )}
+                {errors.email && <span className="text-sm text-red-600">This field is required</span>}
               </div>
               {/* password */}
               <div className="mt-4 space-y-2">
@@ -75,11 +77,7 @@ const Signup = () => {
                   {...register("password", { required: true })}
                 />
                 <br />
-                {errors.email && (
-                  <span className="text-sm text-red-600">
-                    This field is required
-                  </span>
-                )}
+                {errors.password && <span className="text-sm text-red-600">This field is required</span>}
               </div>
               {/* login button */}
               <div className="space-y-2 mt-5 flex justify-stretch">
@@ -88,15 +86,9 @@ const Signup = () => {
                 </button>
                 <div>
                   Already Registered?&nbsp;
-                  <button
-                    className="underline text-blue-500 cursor-pointer"
-                    onClick={() => {
-                      document.getElementById("my_modal_3").showModal();
-                    }}
-                  >
+                  <Link to="/login" state={{ from: "/" }} className="underline text-blue-500 cursor-pointer">
                     Login
-                  </button>
-                  <Login />
+                  </Link>
                 </div>
               </div>
             </form>

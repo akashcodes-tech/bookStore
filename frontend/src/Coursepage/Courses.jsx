@@ -7,7 +7,7 @@ const Courses = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen">
+      <div>
         <Course />
       </div>
       <Footer />
